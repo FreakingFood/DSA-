@@ -1,0 +1,226 @@
+#include<iostream>
+#include<math.h>
+#include<stack> // provides definition of stack
+using std::stack;  // make stack accessible
+using namespace std;
+
+int precedence(char c) // for precedence of operators
+{
+	if(c == '^')
+		return 3;
+	else if(c == '/' || c=='*')
+		return 2;
+	else if(c == '+' || c == '-')
+		return 1;
+	else
+		return -1;
+}
+
+string infixToPostfix(string s) // function to convert infix to postfix
+{
+	stack<char> mystack; //To declare stack of char data type
+	string result; //string after conversion into postfix
+	for(int i = 0; i < s.length(); i++) 
+	{
+		char c = s[i];
+		if((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')) //if character(c) is an operand 
+			result += c; //then add c into result string
+
+		else if(c == '(') //if character(c) is an opening bracket 
+			mystack.push('('); //then push ('(') into mystack
+
+		else if(c == ')') //if character(c) is closing bracket then pop from mystack and add the topmost char into the result string until the next opening brackets comes
+		{
+			while(mystack.top() != '(')
+			{
+				result += mystack.top();
+				mystack.pop();
+			}
+			mystack.pop();
+		}
+		else // for precedence of operator
+		{
+			while(!mystack.empty() && precedence(s[i]) <= precedence(mystack.top())) 
+			{
+				result += mystack.top();
+				mystack.pop();
+			}
+			mystack.push(c);
+		}
+	}
+
+	while(!mystack.empty()) // pop all the left character element from mystack and add it to result string
+	{
+		result += mystack.top();
+		mystack.pop();
+	}
+	
+	return result; //string after conversion
+}
+
+void reverse(string& str)
+{
+    	int n = str.length();
+    	for (int i = 0; i < n / 2; i++)
+        swap(str[i], str[n - i - 1]);
+}
+
+string infixToPrefix(string s)
+{	
+	
+ 	reverse(s);
+	for (int i = 0; i < s.length(); i++) 
+	{
+ 
+        if (s[i] == '(') 
+		{
+            s[i] = ')';
+            i++;
+        }
+        else if (s[i] == ')') 
+		{
+            s[i] = '(';
+            i++;
+        }
+    }
+    string result = infixToPostfix(s);
+    reverse(result);
+ 
+    return result; //string after conversion
+}
+
+int EvaluatePostfix(string s)
+{
+	stack<int>mystack;
+	for(int i=0;i<s.length();i++)
+	{
+		if(s[i]>='0' && s[i]<='9')
+		{		
+			mystack.push(s[i]-'0');
+		}
+		else
+		{
+			int op1=mystack.top();
+			mystack.pop();
+			int op2=mystack.top();
+			mystack.pop();
+			switch(s[i])
+			{
+				case '+': mystack.push(op1+op2);
+						  	break;
+				case '-': mystack.push(op1-op2);
+							break;
+				case '*': mystack.push(op1*op2);
+							break;
+				case '/': mystack.push(op1/op2);
+		 					break;
+		 		case '^': mystack.push(pow(op1,op2));
+		 					break;
+				default:
+					break;
+			}
+		}
+	}
+return mystack.top();
+}
+
+int EvaluatePrefix(string s)
+{
+	stack<int>mystack;
+ 	for(int i = s.length() - 1; i >= 0; i--) 
+	{
+    	if(s[i]>='0' && s[i]<='9')
+			mystack.push(s[i] - '0');
+		else 
+		{
+			int op1 = mystack.top();
+			mystack.pop();
+			int op2 = mystack.top();
+			mystack.pop();
+         	switch (s[i])
+			{
+				case '+': mystack.push(op1+op2);
+						  	break;
+				case '-': mystack.push(op1-op2);
+							break;
+				case '*': mystack.push(op1*op2);
+							break;
+				case '/': mystack.push(op1/op2);
+		 					break;
+		 		case '^': mystack.push(pow(op1,op2));
+		 					break;
+				default:
+					break;
+			}
+		}
+	}
+return mystack.top();
+}
+
+int main() 
+{
+	int press;
+	char choice;
+	cout<<" ***** Application of stack *****\n";
+	cout<<"\n PRESS 1 : Conversion of infix to postfix \n";
+	cout<<" PRESS 2 : Conversion of infix to prefix \n";
+	cout<<" PRESS 3 : Evaluation of postfix \n";
+	cout<<" PRESS 4 : Evaluation of prefix \n";
+	do
+	{
+		cout<<"\n Enter your choice according to the operation you want to perform : ";
+		cin>>press;
+		switch(press)
+		{
+			case 1:
+			{
+				string st;
+				cout<<" Enter string: ";
+				cin>>st;
+				cout<<"\nAfter conversion: ";
+				cout<<infixToPostfix(st);
+			}
+			break;
+			
+			case 2:
+			{
+				string st;
+				cout<<" Enter string: ";
+				cin>>st;
+				cout<<"\nAfter conversion: ";
+				cout<<infixToPrefix(st);
+			}
+			break;
+			
+			case 3:
+			{
+				string st;
+				cout<<" Enter string: ";
+				cin>>st;
+				cout<<"\nAfter Evaluation: ";
+				cout<<EvaluatePostfix(st);
+			}
+			break;
+			
+			case 4:
+			{
+				string st;
+				cout<<" Enter string: ";
+				cin>>st;
+				cout<<"\nAfter Evaluation: ";
+				cout<<EvaluatePrefix(st);
+			}
+			break;
+
+			default : cout<<"\n xxxxx Wrong choice xxxxx";
+					  break;	
+		}
+		
+	cout<<"\n Do you want to continue ?(y or n) ";
+	cin>>choice;
+	}while(choice=='y');
+	return 0;
+}
+
+
+
